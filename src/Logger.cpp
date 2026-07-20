@@ -20,7 +20,7 @@ void Logger::log(const std::string& text, LogLevel level) {
     std::tm tm{};
     localtime_r(&time_now, &tm);
     file << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " [" << levelToString(level) << "] " << text << "\n";
-    file.flush();
+    file.flush(); // Принудительно записываем данные из буфера в файл.
     if (file.fail()) {
         throw std::ios::failure("Failed to write to log file");
     }
