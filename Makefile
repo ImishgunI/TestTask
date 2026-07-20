@@ -8,27 +8,28 @@ LIB_OBJS = $(patsubst src/%.cpp, $(BUILD_DIR)/%.o, $(LIB_SRCS))
 APP_SRCS = app/main.cpp
 APP_OBJS = $(patsubst app/%.cpp, $(BUILD_DIR)/%.o, $(APP_SRCS))
 
-
 LIB_NAME = liblogger.so
-
 BUILD_DIR = build
 
-main: dir lib $(APP_OBJS)
-	$(CXX) $(CXXFLAGS) $(APP_OBJS) -o $@ -L. -llogger -Wl,-rpath,'$$ORIGIN'
-
-$(BUILD_DIR)/%.o: app/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+all: lib main
 
 lib: $(LIB_OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(LIB_OBJS) -o $(LIB_NAME)
+	$(CXX) $(LDFLAGS) $(LIB_OBJS) -o $(LIB_NAME)
 
-$(BUILD_DIR)/%.o: src/%.cpp
+main: lib $(APP_OBJS)
+	$(CXX) $(CXXFLAGS) $(APP_OBJS) -o $@ -L. -llogger -Wl,-rpath,'$$ORIGIN'
+
+
+$(BUILD_DIR)/%.o: src/%.cpp include/*.hpp
+	mkdir -p $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-dir:
-	mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/%.o: app/%.cpp
+	mkdir -p build
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 
 clean:
 	rm -f $(BUILD_DIR)/*.o $(LIB_NAME) main *.log
 
-.PHONY: lib clean
+.PHONY: lib clean main all
