@@ -8,6 +8,8 @@
 #include <mutex>
 #include <thread>
 
+// Задача на запись сообщения в журнал.
+// Если уровень не указан, используется уровень по умолчанию логгера.
 struct LogTask {
     std::string text;
     std::optional<LogLevel> level;
@@ -39,21 +41,27 @@ int main(int argc, char** argv) {
     std::mutex queueMutex;
     std::condition_variable cv;
     bool stop = false;
+
+    // Поток, отвечающий за обработку очереди и запись сообщений в журнал.
     std::thread worker([&]() {
         while(true) {
             std::unique_lock<std::mutex> lock(queueMutex);
 
+            // Ожидаем появления новых задач или сигнала завершения приложения.
             cv.wait(lock, [&]() {
                     return !tasks.empty() || stop;
             });
-
+            
+            // Завершаем поток только после обработки всех сообщений из очереди.
             if (stop && tasks.empty()) {
                 break;
             }
 
             auto task = std::move(tasks.front());
             tasks.pop();
-
+            
+            // Освобождаем очередь перед записью в файл,
+            // чтобы основной поток мог продолжать принимать сообщения.
             lock.unlock();
             try {
                 if (task.level.has_value()) {
