@@ -1,0 +1,4 @@
+DEBUG Debug message
+INFO Info message
+ERROR Error message
+/exit

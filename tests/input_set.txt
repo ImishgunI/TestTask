@@ -1,0 +1,4 @@
+INFO Before
+/set DEBUG
+DEBUG Debug after set
+/exit
