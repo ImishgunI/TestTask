@@ -29,6 +29,10 @@ $(BUILD_DIR)/%.o: app/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 
+test: all
+	chmod +x tests/run_tests.sh
+	./tests/run_tests.sh
+
 clean:
 	rm -f $(BUILD_DIR)/*.o $(LIB_NAME) main *.log
 
