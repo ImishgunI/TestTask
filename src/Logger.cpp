@@ -17,7 +17,10 @@ void Logger::log(const std::string& text, LogLevel level) {
     }
     auto timestamp = std::chrono::system_clock::now();
     auto time_now = std::chrono::system_clock::to_time_t(timestamp);
-    file << std::put_time(std::localtime(&time_now), "%Y-%m-%d %H:%M:%S") << " [" << levelToString(level) << "] " << text << "\n";
+    std::tm tm{};
+    localtime_r(&time_now, &tm);
+    file << std::put_time(&tm, "%Y-%m-%d %H:%M:%S") << " [" << levelToString(level) << "] " << text << "\n";
+    file.flush();
     if (file.fail()) {
         throw std::ios::failure("Failed to write to log file");
     }
