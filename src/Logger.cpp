@@ -1,11 +1,12 @@
 #include "../include/Logger.hpp"
 #include <chrono>
 #include <ctime>
-#include <mutex>
 #include <stdexcept>
 #include <iomanip>
 
-Logger::Logger(const std::string& filename, LogLevel defaultLevel) : file(filename, std::ios::app), defaultLevel(defaultLevel) {
+Logger::Logger(const std::string& filename, LogLevel defaultLevel) : file(filename), defaultLevel(defaultLevel) {
+    file.open(filename, std::ios::app);
+
     if (!file.is_open()) {
         throw std::runtime_error("Failed to open log file: " + filename);
     }
@@ -26,6 +27,7 @@ void Logger::log(const std::string& text) {
 }
 
 void Logger::setDefaultLevel(LogLevel level) {
+    std::lock_guard<std::mutex> lock(mu);
     defaultLevel = level;
 }
 
